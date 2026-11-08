@@ -8,13 +8,14 @@ from benders import BENDERS, VAULT
 
 load_dotenv()
 QUEUE, DONE = VAULT / "Agents/Queue", VAULT / "Agents/Done"
+MAX_USD_PER_RUN = 1.00  # hard stop for a single task, on top of the prepaid credit cap
 
 
 # Windows defaults to cp1252, which breaks on emoji and smart quotes, so always use UTF-8.
 def read_task(path):
     text = path.read_text(encoding="utf-8")
     if not text.lstrip().startswith("---") or text.count("---") < 2:
-        return {}, text.strip()  # no frontmatter: main() reports and skips it
+        return {}, text.strip()  # no frontmatter: process() reports and skips it
     _, fm, body = text.split("---", 2)
     return yaml.safe_load(fm) or {}, body.strip()
 
@@ -24,14 +25,15 @@ def write_task(path, meta, body):
                     encoding="utf-8")
 
 
-async def run(task_path):
+async def run(task_path, emit):
     meta, body = read_task(task_path)
     name = meta["agent"]
     bender = BENDERS[name]
     role = (VAULT / "Agents/Roles" / f"{name}.md").read_text(encoding="utf-8")
     meta["status"] = "working"
+    meta.pop("error", None)
     write_task(task_path, meta, body)
-    print(f"[{name}] started {task_path.stem}")
+    await emit(name, "started", task_path.stem)
 
     options = ClaudeAgentOptions(
         system_prompt=(f"{role}\n\nYou may read anything in the vault. "
@@ -42,37 +44,61 @@ async def run(task_path):
         permission_mode="acceptEdits",
         model=bender["model"],
         max_turns=bender["turns"],
+        max_budget_usd=bender.get("max_usd", MAX_USD_PER_RUN),
     )
     try:
+        result = None
         async for msg in query(prompt=body, options=options):
             if isinstance(msg, AssistantMessage):
                 for block in msg.content:
                     if isinstance(block, ToolUseBlock):
                         target = block.input.get("file_path") or block.input.get("pattern", "")
-                        print(f"[{name}] {block.name} {target}")
+                        await emit(name, "tool", f"{block.name} {target}")
                     elif isinstance(block, TextBlock):
-                        print(f"[{name}] {block.text[:120]}")
+                        await emit(name, "thinking", block.text[:200])
             elif isinstance(msg, ResultMessage):
+                result = msg
                 meta["cost_usd"] = round(msg.total_cost_usd or 0, 4)
-        meta["status"] = "done"
+        if result is None:
+            meta["status"], meta["error"] = "failed", "no result message"
+        elif result.is_error:  # e.g. ran out of turns (stamina) or budget
+            meta["status"], meta["error"] = "failed", result.subtype
+        else:
+            meta["status"] = "done"
     except Exception as e:
         meta["status"], meta["error"] = "failed", str(e)
     meta["finished"] = datetime.now().isoformat(timespec="minutes")
     write_task(task_path, meta, body)
-    print(f"[{name}] {meta['status']} (${meta.get('cost_usd', 0)})")
     if meta["status"] == "done":
         shutil.move(task_path, DONE / task_path.name)
+    await emit(name, meta["status"], meta.get("error") or task_path.stem, meta.get("cost_usd"))
 
 
-async def main():
+def reset_stuck():
+    """A task left at 'working' means the server stopped mid-run. Put it back to todo."""
+    for path in QUEUE.glob("*.md"):
+        meta, body = read_task(path)
+        if meta.get("status") == "working":
+            meta["status"] = "todo"
+            write_task(path, meta, body)
+            print(f"[queue] reset stuck task {path.name}")
+
+
+async def process(emit):
     for path in sorted(QUEUE.glob("*.md")):
         meta, _ = read_task(path)
         if not meta.get("agent"):
             print(f"[queue] skipping {path.name}: no frontmatter with agent/status")
             continue
         if meta.get("status") == "todo" and meta.get("agent") in BENDERS:
-            await run(path)
+            await run(path, emit)
+
+
+async def print_emit(agent, type, detail="", cost=None):
+    print(f"[{agent}] {type} {detail}" + (f" (${cost})" if cost is not None else ""))
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # CLI mode: run the queue once and print events
+    reset_stuck()
+    asyncio.run(process(print_emit))

@@ -25,6 +25,8 @@ Books and his business (Stricker Digital) are parked in vault/Someday/.
   - haven-app\  Next.js app (dashboard + /ellora)
 - forge\benders.py has VAULT = Path(r"C:\_Agents\havens\vault")
 - API key lives in forge\.env (gitignored). Never print it or commit it.
+- The forge runs on port 8787, not the guide's 8000 (Splunk owns 8000 here).
+  Every http://localhost:8000 / ws://localhost:8000 in the guide means 8787.
 - The project vault is separate from Nick's personal vault on purpose.
   Never point any agent at C:\Users\stric\Documents\Obsidian Vault.
 
