@@ -146,7 +146,12 @@ def nightly_coach():
 
 
 def weekly_review():
-    data = json.dumps(compute_metrics("week")[-8:], indent=2)
+    weeks = compute_metrics("week")
+    iso = datetime.now().isocalendar()
+    if not weeks or weeks[-1]["period"] != f"{iso.year}-W{iso.week:02d}":
+        print("[forge] no daily logs this week, skipping rep review")
+        return
+    data = json.dumps(weeks[-8:], indent=2)
     queue_task("coach", "rep-review",
         "Sunday Rep Review. My last 8 weeks of numbers, computed by code. Use them as given, "
         f"never recount:\n```json\n{data}\n```\n"
@@ -156,7 +161,11 @@ def weekly_review():
 
 
 def monthly_ledger():
-    data = json.dumps(compute_metrics("month"), indent=2)
+    months = compute_metrics("month")
+    if not months:
+        print("[forge] no daily logs yet, skipping ledger")
+        return
+    data = json.dumps(months, indent=2)
     queue_task("ledger", "impact-ledger",
         "Monthly ledger. Numbers computed by code. Use them as given, never recount:\n"
         f"```json\n{data}\n```\n"

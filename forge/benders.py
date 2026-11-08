@@ -10,8 +10,8 @@ BENDERS = {
     # add the rest in Step 6 by uncommenting:
     "coach":   {"name": "Suri Windquill", "bends": "air", "role": "Coach",
                 "model": "claude-sonnet-5-5", "turns": 25, "writes": ["Log/Reviews", "Journal/Themes"]},
-    # "ledger":  {"name": "Brannoc Ironvein", "bends": "metal", "role": "Scorekeeper",
-    #             "model": "claude-sonnet-5-5", "turns": 15, "writes": ["Log/Ledger"]},
+    "ledger":  {"name": "Brannoc Ironvein", "bends": "metal", "role": "Scorekeeper",
+                "model": "claude-sonnet-5-5", "turns": 15, "writes": ["Log/Ledger"]},
     # "foreman": {"name": "Tovan Stoneward", "bends": "earth", "role": "Foreman",
     #             "model": "claude-sonnet-5-5", "turns": 20, "writes": ["Log/Briefs"]},
     # "herald":  {"name": "Kael Emberline", "bends": "fire", "role": "Herald",
