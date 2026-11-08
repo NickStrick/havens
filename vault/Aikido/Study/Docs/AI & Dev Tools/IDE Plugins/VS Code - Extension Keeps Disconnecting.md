@@ -1,0 +1,21 @@
+---
+title: "VS Code - Extension Keeps Disconnecting"
+source: https://help.aikido.dev/ai-and-dev-tools/ide-plugins-overview/troubleshooting/vs-code-extension-keeps-disconnecting
+section: AI & Dev Tools
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# VS Code - Extension Keeps Disconnecting
+
+This usually means your key isn’t persisting, check whether VSCode’s storage location is retained.&#x20;
+
+You can run VS Code in verbose mode `code --verbose` and look for log lines mentioning SecretStorage or globalState for errors and other information.
+
+See additional details below for your OS.
+
+* Linux
+  * Encrypted mode: Uses VSCode SecretStorage → KeyStorageLinux → OS-level library (e.g. libsecret), typically stored in the system keyring.
+    * For libsecret you can use `secret-tool search application code`
+  * Unencrypted mode: Uses globalState, stored at \~/.config/Code/User/globalStorage/state.vscdb. If keys aren’t persisting, verify this path is retained across sessions.&#x20;
+    * You read the database to view existing secrets:\
+      `sqlite3 ~/.config/Code/User/globalStorage/state.vscdb "SELECT * FROM ItemTable;"`

@@ -1,0 +1,43 @@
+---
+title: "Connect DigitalOcean Account"
+source: https://help.aikido.dev/cloud-scanning/connect-your-cloud/connect-digitalocean-account-to-aikido
+section: Cloud scanning
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# Connect DigitalOcean Account
+
+### Why connect my DigitalOcean cloud? <a href="#why-connect-my-digitalocean-cloud" id="why-connect-my-digitalocean-cloud"></a>
+
+Securing your cloud infrastructure is crucial to protecting your user data. You can leverage Aikido's security checks to detect and address any misconfigurations in your infrastructure.
+
+**Main Use Cases**
+
+* Aikido surfaces critical cloud misconfigurations that allow hackers to get into your DigitalOcean cloud, such as the risk highlighted in [this blog post](https://www.aikido.dev/blog/how-a-startups-cloud-got-taken-over-by-a-simple-form-that-sends-an-email). All configuration checks can be found [here (filter on DigitalOcean)](https://app.aikido.dev/clouds/checks)
+* If you store Docker images in repo, Aikido looks for most known vulnerabilities in Apache, Nginx etc.
+
+Aikido performs a daily compliance scan on the above.
+
+### Getting started <a href="#getting-started" id="getting-started"></a>
+
+To get started, head to the [cloud overview page](https://app.aikido.dev/clouds) on Aikido and click 'Connect cloud.' Follow the step-by-step setup wizard to connect your DigitalOcean account to Aikido.
+
+<figure><img src="https://help.aikido.dev/_assets/7f388dc59d6a/image-246.png" alt=""><figcaption></figcaption></figure>
+
+To connect your account, you will need to create an access token that Aikido can use in DigitalOcean. Click on "API" in the left-hand navigation to go to the following screen.
+
+![](https://help.aikido.dev/_assets/4bd3c5ccdd6f/ucarecdn-4996db5b-f814-410c-a88e-77ed990b0114.png)
+
+On this page, click on "Generate New Token" to create a new token.
+
+![](https://help.aikido.dev/_assets/24b348835f86/ucarecdn-44e23ed1-bfe4-4e94-853b-68f78eac4440.png)
+
+Enter a descriptive name for your token, and set the expiration to "No expire". Aikido only needs 'Read' access. Click on "Generate Token".
+
+Once your token is created in DigitalOcean, you can copy it and enter it in Aikido's setup wizard, together with the token name you chose.
+
+Finally, you can name your connected project in Aikido and specify the environment it operates in. This information helps Aikido prioritize findings based on the severity and impact to your business.
+
+![](https://help.aikido.dev/_assets/31b0366be7a6/ucarecdn-09b2e048-f427-40c2-9b47-e8ae568b3e92.png)
+
+Within 1-2 minutes after connecting your account, Aikido will report misconfigurations that could pose a threat.

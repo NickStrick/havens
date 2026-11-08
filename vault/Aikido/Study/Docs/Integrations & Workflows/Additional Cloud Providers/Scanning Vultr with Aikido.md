@@ -1,0 +1,47 @@
+---
+title: "Scanning Vultr with Aikido"
+source: https://help.aikido.dev/workflows-and-guides/additional-cloud-providers/scanning-vultr-with-aikido
+section: Integrations & Workflows
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# Scanning Vultr with Aikido
+
+Aikido fully supports protecting workloads on Vultr through specific integrations. A native integration may be added in the future, but you can already achieve full coverage by combining:<br>
+
+* [**Container image scanning**](https://help.aikido.dev/workflows-and-guides/additional-cloud-providers/scanning-vultr-with-aikido#container-image-scanning) for Vultr registry or any other OCI-compatible registry
+* [**Kubernetes cluster scanning**](https://help.aikido.dev/workflows-and-guides/additional-cloud-providers/scanning-vultr-with-aikido#kubernetes-cluster-scanning) for Vultr Managed Kubernetes or self-managed clusters
+* [**Kubernetes cluster image scanning**](https://help.aikido.dev/workflows-and-guides/additional-cloud-providers/scanning-vultr-with-aikido#kubernetes-cluster-image-scanning) for Vultr Managed Kubernetes or self-managed clusters
+* [**Virtual machine scanning**](https://help.aikido.dev/workflows-and-guides/additional-cloud-providers/scanning-vultr-with-aikido#virtual-machine-scanning) via the Local VM Scanner on Vultr instances
+
+## Features
+
+### Container image scanning
+
+Vultr’s container registry and most third-party registries you use from Vultr are OCI-compatible, so they can be scanned using Aikido.
+
+Create a read-only or pull-only user in Vultr registry: [https://docs.vultr.com/products/container-registry/management/configurations/generate-docker-config](https://docs.vultr.com/products/container-registry/management/configurations/generate-docker-config)
+
+Follow the OCI guide below to configure container image scanning
+
+[generic-oci-compatible-registry.md](https://help.aikido.dev/container-image-scanning/standalone-registries/generic-oci-compatible-registry)
+
+### Kubernetes cluster scanning
+
+If you use Vultr Managed Kubernetes or run your own Kubernetes clusters on Vultr VMs, you can connect them as generic Kubernetes clusters.
+
+[kubernetes-cluster-scanning](https://help.aikido.dev/cloud-scanning/kubernetes-cluster-scanning)
+
+### Kubernetes cluster image scanning
+
+If you use Vultr Managed Kubernetes or run your own Kubernetes clusters on Vultr VMs, you can scan the images of running containers with Kubernetes image scanning.
+
+[kubernetes-in-cluster-image-scanning.md](https://help.aikido.dev/cloud-scanning/kubernetes-cluster-scanning/kubernetes-in-cluster-image-scanning)
+
+### Virtual Machine scanning
+
+To scan Virtual Machines on Vultr, use the Local VM Scanner. It inspects packages, system dependencies and configuration directly on the instance.
+
+[local-vm-scanning](https://help.aikido.dev/virtual-machine-scanning/local-vm-scanning)
+
+You can roll this out centrally using your usual automation tooling (e.g. Ansible, Terraform-provisioned scripts, or cloud-init) so that new Vultr instances are automatically enrolled.

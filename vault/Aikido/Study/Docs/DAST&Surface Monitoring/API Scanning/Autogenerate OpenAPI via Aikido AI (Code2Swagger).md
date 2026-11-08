@@ -1,0 +1,48 @@
+---
+title: "Autogenerate OpenAPI via Aikido AI (Code2Swagger)"
+source: https://help.aikido.dev/dast-surface-monitoring/api-scanning/autogenerate-openapi-via-aikido-ai-code2swagger
+section: DAST&Surface Monitoring
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# Autogenerate OpenAPI via Aikido AI (Code2Swagger)
+
+Aikido can automatically generate an OpenAPI specification directly from your codebase, eliminating the need for manual documentation while ensuring accurate API scanning.
+
+It uses LLM to parse your source code to find routes, parameters and body information without the need to build your own API specification.
+
+Aikido will regularly rescan your code to keep the OpenAPI specification up to date.
+
+> [!tip]
+> Aikido recommends using [Zen Firewall](https://help.aikido.dev/zen-firewall/getting-started-with-zen-firewall) whenever possible as it will give more accurate results because it's based on the actual traffic to your API.
+
+### How to use
+
+Follow the [Setting up REST API Scanning](https://help.aikido.dev/dast-surface-monitoring/api-scanning/rest-api-scanning#setting-up-rest-api-scanning) guide and choose the **Aikido AI** option.
+
+<figure><img src="https://help.aikido.dev/_assets/13b6c74baa5f/Screenshot-2025-07-14-at-10.28.09.png" alt=""><figcaption></figcaption></figure>
+
+### Supported Programming Languages
+
+> [!warning]
+> This feature supports back-end code analysis only; front-end code is not supported.
+
+* C
+* C++
+* C# / Dotnet
+* Dart
+* Elixir
+* Go
+* Java
+* Javascript
+* Kotlin
+* PHP
+* Python
+* Ruby
+* Rust
+* Swift
+* Scala
+* Typescript / TSX
+* VB.NET (only route discovery)
+
+<br>

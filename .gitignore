@@ -1,0 +1,10 @@
+forge/.env
+
+# Obsidian per-device UI state
+vault/.obsidian/workspace*.json
+vault/.obsidian/cache
+
+# Python
+forge/.venv/
+__pycache__/
+forge/events.db

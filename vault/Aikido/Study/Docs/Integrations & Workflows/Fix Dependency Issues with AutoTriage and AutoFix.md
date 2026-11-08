@@ -1,0 +1,85 @@
+---
+title: "Fix Dependency Issues with AutoTriage and AutoFix"
+source: https://help.aikido.dev/workflows-and-guides/resolve-dependency-vulnerabilities-with-autotriage-and-ai-autofix
+section: Integrations & Workflows
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# Fix Dependency Issues with AutoTriage and AutoFix
+
+### Prerequisites
+
+You'll need:
+
+* An [Aikido account](https://app.aikido.dev/login)
+* A personal [GitHub account](https://github.com/login) (to fork the sample project)
+
+## Connect sample repo to Aikido
+
+This tutorial will make use of a public repository called [Damn Vulnerable Python Web App](https://github.com/anxolerd/dvpwa), a variant of the popular [Damn Vulnerable Web Application](https://github.com/digininja/DVWA) used for demoing security tools.&#x20;
+
+First, [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) the [DVPWA](https://github.com/anxolerd/dvpwa) repository to your GitHub namespace so you have a personal copy to work with. Then log into an Aikido workspace and navigate to **Repositories > Manage Repos**. Click **Add Repo**. If prompted, grant GitHub permission to select repositories and choose your forked repo of DVPWA.&#x20;
+
+If redirected to Aikido and asked which repos to scan, select your DVPWA repo. Then click **Next, Details**. You will then be brought to into the feed for your workspace.&#x20;
+
+<figure><img src="https://help.aikido.dev/_assets/0b829dbef111/Screenshot-2025-10-21-at-3.01.26-PM.png" alt=""><figcaption></figcaption></figure>
+
+## Analyze initial findings and false positives&#x20;
+
+In your feed, you'll see a summary of the scan results against the repository. Take note of the default filter being **Aikido refined** findings. Hover your cursor over the filter selection to view a funnel chart showing how Aikido has reduced false positives. Since this is a demo app with deliberately highly exploitable vulnerabilities, most of them remain after triage. However, Aikido will commonly reduce false positive noise by upwards of 90% in your typical codebase.
+
+<figure><img src="https://help.aikido.dev/_assets/4782b0b28541/Screenshot-2025-10-21-at-5.20.04-PM.png" alt=""><figcaption></figcaption></figure>
+
+In the upper right corner, select the tile that reads **1 Auto Ignored**. That will take you to the **Ignored** section of your feed.
+
+Note the issue name (`pyyaml`), type (Python package), severity (Critical) and reason for ignoring. Even though this is a critical vulnerability for a severely outdated package, Aikido suggests that the function is not used anywhere in the codebase (aside from being declared).&#x20;
+
+<figure><img src="https://help.aikido.dev/_assets/49e375090219/Screenshot-2025-10-21-at-5.39.55-PM.png" alt=""><figcaption></figcaption></figure>
+
+Click into the issue to open a drawer showing more details. The declared version of the package, 3.13, is affected by two critical CVE's marked as subissues.&#x20;
+
+While the official fix is to upgrade to version 5.4, Aikido has marked the issue as safe to ignore. Click the **Affected function not in use** downgrade message beneath one of the subissues. This confirms Aikido has performed a [reachability analysis](https://help.aikido.dev/getting-started/reachability-analysis/reachability-engine-to-remove-false-positives) and determined the package is not used anywhere in the code.&#x20;
+
+<figure><img src="https://help.aikido.dev/_assets/7a4ce4c56863/Screenshot-2025-10-21-at-5.48.58-PM.png" alt="" width="375"><figcaption></figcaption></figure>
+
+> [!info]
+> Reachability is core to how Aikido assesses the relevance and impact of security issues. [Read more](https://help.aikido.dev/getting-started/reachability-analysis/reachability-engine-to-remove-false-positives) about Aikido's reachability engine.
+
+Return to the issue details and click **View reachability analysis**. The flowchart shows that the affected version of **pyyaml,** while declared in requirements.txt, is not used anywhere in the code nor are any functions that depend on it.
+
+<figure><img src="https://help.aikido.dev/_assets/ba66a1fe54f5/Screenshot-2025-10-21-at-5.51.59-PM.png" alt="" width="375"><figcaption></figcaption></figure>
+
+As a counter-example, return to the main Aikido refined issue feed. Click into the criticaly vulnerable `aiohttp` package. The issue details show a multitude of CVE's. For CVE-2024-23334, click **View reachability analysis**. Here we see that two different package depending on aiohttp are used by two different files in the codebase.&#x20;
+
+<figure><img src="https://help.aikido.dev/_assets/ed1737af4a20/Screenshot-2025-10-21-at-5.58.46-PM.png" alt="" width="375"><figcaption></figcaption></figure>
+
+Back in the issue details, click the **Upgraded** mesage for CVE-2024-23334. Aikido provides two reasons for the upgraded severity: (1) exploitation code exists on GitHub and is therefore highly discoverable, and (2) the vulnerability is actively being exploited in the real world.
+
+<figure><img src="https://help.aikido.dev/_assets/89aa71415015/Screenshot-2025-10-21-at-6.30.21-PM.png" alt=""><figcaption></figcaption></figure>
+
+## Use AutoFix to resolve security issues
+
+> [!info]
+> Aikido AutoFix is an agent that leverages best-in-class LLMs to offer one-click fixes to security issues, either inline or via pull request. [Learn more](https://help.aikido.dev/autofix-and-remediation/overview-aikido-autofix) about AutoFix.
+
+Still in the details drawer for the aiohttp issue, next to **How do I fix it?**, click **AutoFix**.  This will take you to the AutoFix page. Here Aikido will propose bumping the version of aiohttp in requirements.txt from 3.5.3 to  3.12.14.&#x20;
+
+To apply the fix via a new pull request, open the kebab menu next to the status column and click **Create PR.** (Note: you may be prompted to grant Aikido write access to your repository. This is necessary for Aikido to open pull requests on your behalf).
+
+<figure><img src="https://help.aikido.dev/_assets/5a45da16542e/Screenshot-2025-10-21-at-6.14.36-PM.png" alt=""><figcaption></figcaption></figure>
+
+If prompted to apply a fix to either all packages or specific packages, select **all packages**. Aikido will open a dialog window as the PR creation processes. When it is finished, click **View PR**.
+
+<figure><img src="https://help.aikido.dev/_assets/a9766ff24166/Screenshot-2025-10-21-at-6.17.54-PM.png" alt=""><figcaption></figcaption></figure>
+
+You will then be taken to an open PR in your GitHub repository (your dvpwa fork). Aikido has filled out a detailed description as to the vulnerabilities resolved by the change. You can also click the **Files changed** tab to see the bumped package version in requirements.txt&#x20;
+
+<figure><img src="https://help.aikido.dev/_assets/2ae10f15b3f4/Screenshot-2025-10-21-at-6.22.20-PM.png" alt=""><figcaption></figcaption></figure>
+
+At this point you can choose to either close the pull request or abandon in (if you'd like to preserve the vulnerability for future testing).&#x20;
+
+You did it! In this tutorial, you:
+
+* Connected a repository to Aikido and ran your first security scan
+* Auto-triaged vulnerabilities based on their severity and exposure in the codebase
+* Used AutoFix to propose and apply a fix to a vulnerable dependency

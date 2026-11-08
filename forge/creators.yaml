@@ -1,0 +1,20 @@
+# Creators the Scout studies. Check each handle by opening youtube.com/<handle>.
+creators:
+  - "@vinhgiang"
+  - "@AlexanderTheCreate"   # unconfirmed: copy the exact handle from the channel page
+  - "@AlexHormozi"
+  - "@ShiHengYiOnline"
+  - "@jimmycarr"
+
+# Niche searches, roughly one per pillar plus the SE journey.
+# Each keyword costs 100 of your 10,000 free daily quota units.
+keywords:
+  - "how to learn any skill fast"
+  - "deliberate practice"
+  - "how to explain technical things simply"
+  - "solutions engineer"
+  - "system design explained simply"
+
+settings:
+  videos_per_creator: 50   # recent uploads checked per creator
+  keyword_days: 30         # only videos published in the last N days

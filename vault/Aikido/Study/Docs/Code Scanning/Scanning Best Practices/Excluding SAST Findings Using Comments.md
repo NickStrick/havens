@@ -1,0 +1,35 @@
+---
+title: "Excluding SAST Findings Using Comments"
+source: https://help.aikido.dev/code-scanning/scanning-practices/excluding-sast-findings-using-comments
+section: Code Scanning
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# Excluding SAST Findings Using Comments
+
+It is possible to ignore specific SAST finding using a  `//nosec` comment at the first line or preceding line of the pattern match. By adding this comment, the finding will be ignored in the Aikido feed and marked as _manually suppressed by developer._
+
+Below you will find some examples of how a NoSQL injection issue can be ignored using comments.
+
+Ignore by adding comment to line preceding the detected issue:
+
+```typescript
+module.exports = function trackOrder () {
+    return (req: Request, res: Response) => {
+        const id = foo.a() ? String(req.params.id) : req.params.id
+        // nosec
+        Solution.findOne({ _id: req.body.id }) 
+    }
+}
+```
+
+Ignore by adding comment to first (or only) of the detected issue:
+
+```typescript
+module.exports = function trackOrder () {
+    return (req: Request, res: Response) => {
+        const id = foo.a() ? String(req.params.id) : req.params.id
+        Solution.findOne({ _id: req.body.id }) // nosec
+    }
+}
+```

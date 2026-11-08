@@ -1,0 +1,30 @@
+---
+title: "PR Gating for Code Using Local Scanner"
+source: https://help.aikido.dev/code-scanning/local-code-scanning/pr-gating-for-code-using-local-scanner
+section: Code Scanning
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# PR Gating for Code Using Local Scanner
+
+The Aikido Local Scanner can be used to enforce security gates in your CI pipeline.
+
+> [!info]
+> You can also use PR gating with your cloud-connected workspaces (GitHub, BitBucket, etc). Check out our CI [Integration section](https://help.aikido.dev/section/ci-integrations/sg3q6UrIf4qE).
+
+PR gating ensures that new code meets your security standards before it is merged into the default branch. It scans only the changes introduced in the pull request. If the scan detects new issues that meet or exceed your configured severity threshold, the CI pipeline fails.
+
+This prevents new vulnerabilities from being introduced while allowing existing findings to be addressed separately.
+
+> [!info]
+> We also support [release gating](https://help.aikido.dev/container-image-scanning/local-image-scanning/release-gating-for-container-images-using-local-image-scanner) for teams that want to enforce checks at release time.
+
+To enable PR gating, add the `--fail-on <severity>` option to select your preferred severity level. Then, add the `--gating-mode pr` option to signify that you wish to perform PR gating. You must also specify the base (`--base-commit-id <commit-id>`) and head commit (`--head-commit-id <commit-id>`). If there a scan was previously performed on the base commit id, the scan results will be compared to those. If not, the results will be compared to the most recent scan on your default branch.
+
+For implementation details see:
+
+* [GitLab Self Managed](https://help.aikido.dev/code-scanning/local-code-scanning/pr-gating/gitlab-pr-gating-using-local-scanner)
+* [GitHub](https://help.aikido.dev/code-scanning/local-code-scanning/pr-gating/github-pr-gating-using-local-scanner)
+* [BitBucket](https://help.aikido.dev/code-scanning/local-code-scanning/pr-gating/bitbucket-pr-gating-using-local-scanner)
+* [Azure DevOps Server](https://help.aikido.dev/code-scanning/local-code-scanning/pr-gating/azure-devops-pr-gating-using-local-scanner)
+* [Jenkins](https://help.aikido.dev/code-scanning/local-code-scanning/pr-gating/jenkins-pr-gating-using-local-scanner)

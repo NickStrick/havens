@@ -1,0 +1,26 @@
+---
+title: "Patch Creation SLA"
+source: https://help.aikido.dev/autofix-and-remediation/aikido-libraries-overview/patch-creation-sla
+section: Autofix & Remedation
+fetched: 2026-11-08
+generated: ingest_docs
+---
+# Patch Creation SLA
+
+For every new CVE that is detected in an existing **Aikido Image**, or in an **Aikido Library**, the following SLA apply:
+
+| Severity        | SLA                     |
+| --------------- | ----------------------- |
+| CISA KEV        | 48 hours                |
+| Critical / High | 7 days                  |
+| Medium / Low    | Commercially reasonable |
+
+SLA timelines start once a CVE is published and a valid fix candidate is available in the upstream ecosystem.
+
+### Scope: Bulk Rollout vs. one-off fixes
+
+This SLA applies to **Aikido Libraries enrolled via Bulk Rollout** (AutoFix > Aikido Libraries > Bulk Rollout). One-off Aikido Libraries fixes taken from the Feed or from AutoFix > Dependencies, without enrolling the repository through Bulk Rollout, are not covered by this SLA.
+
+### A note on pre-existing CVEs
+
+**Aikido Libraries** - the SLA covers new CVEs that arise after you enroll your repository. Pre-existing CVEs will still be fixed, but they are not covered under the SLA commitment. This is because repositories can carry a large backlog of open CVEs at the time of enrollment, and working through that debt is handled separately.
