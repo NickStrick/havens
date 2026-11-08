@@ -57,6 +57,14 @@ Books and his business (Stricker Digital) are parked in vault/Someday/.
 - Story assets live in vault/Stories/ (Story Bank/Star, Full, Raw Stories;
   Origin/Master Origin). There is no separate Story Bank.md.
 - Anthropic API is prepaid ($20 credits, auto-reload off) as the spend cap.
+- Budget target: $15-20/month. Enforced in code (forge/settings.py + fire()/gate()
+  in server.py): monthly cap (default $18) holds all scheduled and queued runs;
+  saver mode (manual, or auto at 70% of cap) cuts the plan from ~$16.50 to ~$6.
+  Each job in server.py JOBS has a normal and a saver profile (model, effort,
+  max_usd per run). SE core (lessons, coaching, Rep Review, ledger) stays on
+  Sonnet; routine jobs run on Haiku. Toggles live on the dashboard.
+- Nick doesn't want paid test runs until the whole app (incl. Ellora) is done.
+  Test with offline stubs, sample data and in-memory DBs instead.
 
 ## The brigade (keys used in code)
 | key | name | bends | job |

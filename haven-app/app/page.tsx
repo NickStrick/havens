@@ -7,6 +7,7 @@ import { CoachingPanel } from "@/components/dashboard/CoachingPanel";
 import { CrewBar } from "@/components/dashboard/CrewBar";
 import { LiveFeed } from "@/components/dashboard/LiveFeed";
 import { CostPanel } from "@/components/dashboard/CostPanel";
+import { BudgetPanel } from "@/components/dashboard/BudgetPanel";
 
 export default function Dashboard() {
   const connected = useForge((s) => s.connected);
@@ -42,6 +43,7 @@ export default function Dashboard() {
         <CrewBar />
         <LiveFeed />
         <CostPanel />
+        <BudgetPanel />
       </div>
     </main>
   );

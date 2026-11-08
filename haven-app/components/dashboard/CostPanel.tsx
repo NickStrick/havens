@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 import { forgeGet, forgePost, useForge } from "@/lib/forge";
 import { Panel } from "./Panel";
 
-type Costs = { today: number; week: number; total: number; by_agent: Record<string, { usd: number; runs: number }> };
+type Costs = {
+  today: number; week: number; month: number; total: number;
+  by_agent: Record<string, { usd: number; runs: number; avg: number }>;
+};
 const usd = (n: number) => `$${n.toFixed(2)}`;
 const CREDITS = 20; // prepaid API credits, auto-reload off
 
@@ -22,10 +25,13 @@ export function CostPanel() {
     setRunning(true);
     try {
       const r = await forgePost("/run");
-      const { pending, busy } = (await r.json()) as { pending: { task: string }[]; busy: boolean };
+      const { pending, busy, held } = (await r.json()) as
+        { pending: { task: string }[]; busy: boolean; held: string | null };
       setNote(
         pending.length === 0
           ? "Queue is empty. Drop a task file in vault/Agents/Queue/ first."
+          : held
+          ? `Held: ${held}. Raise the cap in Budget & schedule, or add force: true to a task.`
           : `${busy ? "Forge is busy; queued after the current run" : "Running"}: ${pending.map((t) => t.task).join(", ")}`,
       );
     } catch {
@@ -46,7 +52,7 @@ export function CostPanel() {
       {!costs ?<p className="text-sm text-muted">Can&apos;t reach the forge.</p> : (
         <>
           <div className="grid grid-cols-3 gap-3">
-            {([["Today", costs.today], ["This week", costs.week], ["All time", costs.total]] as const).map(([l, v]) => (
+            {([["Today", costs.today], ["This week", costs.week], ["This month", costs.month]] as const).map(([l, v]) => (
               <div key={l}>
                 <div className="text-xs text-muted">{l}</div>
                 <div className="text-xl font-semibold">{usd(v)}</div>
@@ -60,7 +66,7 @@ export function CostPanel() {
             {Object.entries(costs.by_agent).sort((a, b) => b[1].usd - a[1].usd).map(([k, v]) => (
               <li key={k} className="flex justify-between text-ink-2">
                 <span>{benders[k]?.name ?? k}</span>
-                <span>{usd(v.usd)} · {v.runs} run{v.runs === 1 ? "" : "s"}</span>
+                <span>{usd(v.usd)} · {v.runs} run{v.runs === 1 ? "" : "s"} · avg {usd(v.avg)}</span>
               </li>
             ))}
           </ul>

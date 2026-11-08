@@ -11,3 +11,4 @@ forge/events.db
 
 .env
 .venv
+forge/state/

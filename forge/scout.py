@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 API = "https://www.googleapis.com/youtube/v3"
-CONFIG = yaml.safe_load(Path(__file__).with_name("creators.yaml").read_text())
+CONFIG = yaml.safe_load(Path(__file__).with_name("creators.yaml").read_text(encoding="utf-8"))
 SHORT_MAX_SECONDS = 180  # YouTube Shorts can run up to 3 minutes
 
 

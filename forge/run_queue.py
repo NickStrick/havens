@@ -8,7 +8,8 @@ from benders import BENDERS, VAULT
 
 load_dotenv()
 QUEUE, DONE = VAULT / "Agents/Queue", VAULT / "Agents/Done"
-MAX_USD_PER_RUN = 1.00  # hard stop for a single task, on top of the prepaid credit cap
+MAX_USD_PER_RUN = 0.60  # default hard stop for a single task (jobs set their own)
+TOOLS = ["Read", "Glob", "Grep", "Write", "Edit"]  # only these are loaded: smaller prompt, lower cost
 
 
 # Windows defaults to cp1252, which breaks on emoji and smart quotes, so always use UTF-8.
@@ -35,16 +36,24 @@ async def run(task_path, emit):
     write_task(task_path, meta, body)
     await emit(name, "started", task_path.stem)
 
+    # The task's own frontmatter wins (scheduled jobs set it), then the bender's defaults.
+    model = meta.get("model") or bender["model"]
+    effort = meta.get("effort") or bender.get("effort", "medium")
+    max_usd = float(meta.get("max_usd") or bender.get("max_usd", MAX_USD_PER_RUN))
     options = ClaudeAgentOptions(
         system_prompt=(f"{role}\n\nYou may read anything in the vault. "
                        f"Only create or edit files inside: {', '.join(bender['writes'])}. "
+                       "Be efficient: read only the files you need, and don't re-read files "
+                       "already pasted into the task. "
                        f"Today is {datetime.now():%A %Y-%m-%d}."),
         cwd=str(VAULT),
-        allowed_tools=["Read", "Glob", "Grep", "Write", "Edit"],
+        tools=TOOLS,
+        allowed_tools=TOOLS,
         permission_mode="acceptEdits",
-        model=bender["model"],
+        model=model,
+        effort=effort,
         max_turns=bender["turns"],
-        max_budget_usd=bender.get("max_usd", MAX_USD_PER_RUN),
+        max_budget_usd=max_usd,
     )
     try:
         result = None
@@ -84,14 +93,28 @@ def reset_stuck():
             print(f"[queue] reset stuck task {path.name}")
 
 
-async def process(emit):
+_last_block = None
+
+
+async def process(emit, gate=None):
+    """Run every todo task. `gate()` returns None to allow, or a reason to hold the queue
+    (the monthly cap). A task with `force: true` in its frontmatter skips the gate."""
+    global _last_block
     for path in sorted(QUEUE.glob("*.md")):
         meta, _ = read_task(path)
         if not meta.get("agent"):
             print(f"[queue] skipping {path.name}: no frontmatter with agent/status")
             continue
-        if meta.get("status") == "todo" and meta.get("agent") in BENDERS:
-            await run(path, emit)
+        if meta.get("status") != "todo" or meta.get("agent") not in BENDERS:
+            continue
+        reason = gate() if gate else None
+        if reason and not meta.get("force"):
+            if reason != _last_block:  # announce once, not every 30 s
+                await emit(meta["agent"], "held", f"{path.stem}: {reason}")
+                _last_block = reason
+            continue
+        _last_block = None
+        await run(path, emit)
 
 
 async def print_emit(agent, type, detail="", cost=None):
