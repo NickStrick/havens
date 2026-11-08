@@ -10,7 +10,7 @@ SONNET, HAIKU = "claude-sonnet-5-5", "claude-haiku-5-5"
 PATH = Path(__file__).parent / "state" / "settings.json"
 DEFAULTS = {
     "monthly_cap_usd": 18.0,  # hard stop: no scheduled or queued runs past this
-    "saver": False,           # cheaper models / fewer runs for lower-priority jobs
+    "saver": True,            # cheaper models / fewer runs for lower-priority jobs (default plan)
     "auto_saver": True,       # switch to saver automatically once spend passes...
     "auto_saver_at": 0.7,     # ...this share of the cap
     "jobs": {},               # job name -> False to turn a recurring job off

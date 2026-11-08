@@ -7,6 +7,7 @@ import { forgeGet, useForge } from "@/lib/forge";
 import { DISTRICTS } from "@/lib/districts";
 import { townState, useNow } from "@/lib/ellora";
 import { startDemo } from "@/lib/demo";
+import { useTownLife } from "@/lib/life";
 
 export default function ElloraPage() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -39,6 +40,7 @@ export default function ElloraPage() {
       out[k] = Math.max(serverDone[k] ?? 0, events.filter((e) => e.agent === k && e.type === "done").length);
     return out;
   }, [serverDone, events]);
+  const actors = useTownLife(states, now);
   const working = Object.values(states).filter((s) => s === "working").length;
   const ticker = events.slice(0, 4);
 
@@ -48,7 +50,8 @@ export default function ElloraPage() {
       <div className="grid flex-1 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="relative min-h-[60vh]">
           <div className="absolute inset-0">
-            <Ellora selected={selected} onSelect={setSelected} now={now} doneCounts={doneCounts} />
+            <Ellora selected={selected} onSelect={setSelected} now={now} doneCounts={doneCounts}
+              states={states} actors={actors} />
           </div>
           {/* event ticker */}
           <ol className="pointer-events-none absolute bottom-2 left-2 space-y-0.5 text-xs text-[#e8e2d0]" aria-live="polite">
@@ -61,7 +64,8 @@ export default function ElloraPage() {
           </ol>
         </div>
         <div className="border-t border-white/10 bg-[#0a1820] lg:border-l lg:border-t-0">
-          <SidePanel selected={selected} onSelect={setSelected} states={states} doneCounts={doneCounts} />
+          <SidePanel selected={selected} onSelect={setSelected} states={states} doneCounts={doneCounts}
+            activity={Object.fromEntries(Object.entries(actors).map(([k, a]) => [k, a.label]))} />
         </div>
       </div>
     </main>

@@ -59,7 +59,7 @@ Books and his business (Stricker Digital) are parked in vault/Someday/.
 - Anthropic API is prepaid ($20 credits, auto-reload off) as the spend cap.
 - Budget target: $15-20/month. Enforced in code (forge/settings.py + fire()/gate()
   in server.py): monthly cap (default $18) holds all scheduled and queued runs;
-  saver mode (manual, or auto at 70% of cap) cuts the plan from ~$16.50 to ~$6.
+  saver mode is the DEFAULT plan (~$6/mo); normal plan ~$16.50 is opt-in. Auto-saver at 70% of cap.
   Each job in server.py JOBS has a normal and a saver profile (model, effort,
   max_usd per run). SE core (lessons, coaching, Rep Review, ledger) stays on
   Sonnet; routine jobs run on Haiku. Toggles live on the dashboard.

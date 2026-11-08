@@ -93,3 +93,40 @@ body {
   .particle, .sel-pulse, .animate-bounce { animation: none !important; }
   .particle { opacity: .6; }
 }
+
+/* bender life: motion for still poses, bending effects, sprite strips */
+.anim-bob, .anim-sway, .anim-float, .anim-breathe, .anim-breathe-slow, .anim-nod, .anim-jump,
+.fx-spin, .fx-spin-rev, .fx-float, .fx-flicker, .fx-flash, .fx-drift { transform-box: fill-box; transform-origin: center; }
+.anim-bob { animation: a-bob .45s ease-in-out infinite; }
+.anim-sway { animation: a-sway 1.4s ease-in-out infinite; transform-origin: bottom; }
+.anim-float { animation: a-float 2.6s ease-in-out infinite; }
+.anim-breathe { animation: a-breathe 3s ease-in-out infinite; transform-origin: bottom; }
+.anim-breathe-slow { animation: a-breathe 5s ease-in-out infinite; transform-origin: bottom; }
+.anim-nod { animation: a-nod 1.8s ease-in-out infinite; transform-origin: bottom; }
+.anim-jump { animation: a-jump .7s ease-out infinite; }
+.anim-legs rect:first-child { animation: a-leg .45s ease-in-out infinite; transform-box: fill-box; transform-origin: top; }
+.anim-legs rect:last-child { animation: a-leg .45s ease-in-out infinite reverse; transform-box: fill-box; transform-origin: top; }
+.anim-zz { animation: a-zz 2.4s ease-out infinite; }
+@keyframes a-bob { 50% { transform: translateY(-2px) } }
+@keyframes a-sway { 25% { transform: rotate(-3deg) } 75% { transform: rotate(3deg) } }
+@keyframes a-float { 50% { transform: translateY(-4px) } }
+@keyframes a-breathe { 50% { transform: scaleY(1.025) } }
+@keyframes a-nod { 20% { transform: rotate(2deg) } 40% { transform: rotate(-1deg) } 60% { transform: rotate(0) } }
+@keyframes a-jump { 0%,100% { transform: translateY(0) } 40% { transform: translateY(-9px) } }
+@keyframes a-leg { 50% { transform: rotate(18deg) } }
+@keyframes a-zz { 0% { opacity: 0; transform: translate(0,0) } 30% { opacity: 1 } 100% { opacity: 0; transform: translate(6px,-12px) } }
+.fx-spin { animation: fx-spin 2s linear infinite; }
+.fx-spin-rev { animation: fx-spin 3s linear infinite reverse; }
+.fx-float { animation: a-float 1.6s ease-in-out infinite; }
+.fx-flicker { animation: fx-flicker .5s ease-in-out infinite alternate; transform-origin: bottom; }
+.fx-flash { animation: fx-flash .6s steps(2, end) infinite; }
+.fx-drift { animation: fx-drift 1.8s ease-in-out infinite; }
+@keyframes fx-spin { to { transform: rotate(360deg) } }
+@keyframes fx-flicker { from { transform: scaleY(.85) skewX(-4deg) } to { transform: scaleY(1.12) skewX(4deg) } }
+@keyframes fx-flash { 0% { opacity: 1 } 50% { opacity: 0 } }
+@keyframes fx-drift { 50% { transform: translateX(5px) } }
+.strip { animation-name: strip; animation-timing-function: steps(var(--n)); animation-iteration-count: infinite; }
+@keyframes strip { to { transform: translateX(var(--shift)) } }
+@media (prefers-reduced-motion: reduce) {
+  [class*="anim-"], [class*="fx-"], .strip { animation: none !important; }
+}

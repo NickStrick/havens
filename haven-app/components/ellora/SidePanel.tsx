@@ -3,6 +3,7 @@ import { DISTRICTS } from "@/lib/districts";
 import { useForge } from "@/lib/forge";
 import { useBudget } from "@/lib/budget";
 import { BADGE, type TownState } from "@/lib/ellora";
+import { portrait } from "@/lib/sprites";
 
 const STATE_LABEL: Record<TownState, string> = {
   failed: "Failed", working: "Working", done: "Done", review: "Waiting on you", asleep: "Asleep (3+ days quiet)", idle: "Idle",
@@ -13,9 +14,9 @@ const STATE_DOT: Record<TownState, string> = {
 const time = (ts: number) => new Date(ts * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 /** Selected district details, or the town roster when nothing is selected. Read-only. */
-export function SidePanel({ selected, onSelect, states, doneCounts }:
+export function SidePanel({ selected, onSelect, states, doneCounts, activity }:
   { selected: string | null; onSelect: (k: string | null) => void;
-    states: Record<string, TownState>; doneCounts: Record<string, number> }) {
+    states: Record<string, TownState>; doneCounts: Record<string, number>; activity: Record<string, string> }) {
   const benders = useForge((s) => s.benders);
   const events = useForge((s) => s.events);
   const { jobs } = useBudget();
@@ -29,7 +30,9 @@ export function SidePanel({ selected, onSelect, states, doneCounts }:
             <li key={k}>
               <button onClick={() => onSelect(k)} className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-white/5">
                 <span className="inline-block h-3 w-3 rounded-sm" style={{ background: d.color }} />
-                <span className="flex-1">{d.label}<span className="block text-xs text-[#a9a28e]">{benders[k]?.name ?? d.name}</span></span>
+                <span className="flex-1">{d.label}
+                  <span className="block text-xs text-[#a9a28e]">{(benders[k]?.name ?? d.name).split(" ")[0]} · {activity[k] ?? "…"}</span>
+                </span>
                 <span className="flex items-center gap-1 text-xs text-[#cfc8b2]">
                   <span className="inline-block h-2 w-2 rounded-full" style={{ background: STATE_DOT[states[k]] }} />
                   {BADGE[states[k]] ?? ""} {states[k]}
@@ -53,7 +56,12 @@ export function SidePanel({ selected, onSelect, states, doneCounts }:
     <aside className="space-y-4 p-4 text-sm text-[#e8e2d0]">
       <button onClick={() => onSelect(null)} className="text-xs text-[#a9a28e] hover:underline">← All districts</button>
       <div className="flex items-start gap-3">
-        <span className="mt-1 inline-block h-8 w-8 shrink-0 rounded-full border-2 border-white" style={{ background: d.color }} />
+        {portrait(selected) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={portrait(selected)!} alt="" className="h-16 w-16 shrink-0 rounded-lg border-2 object-cover" style={{ borderColor: d.color }} />
+        ) : (
+          <span className="mt-1 inline-block h-8 w-8 shrink-0 rounded-full border-2 border-white" style={{ background: d.color }} />
+        )}
         <div>
           <div className="text-xs uppercase tracking-wider text-[#a9a28e]">{d.label}</div>
           <div className="text-lg font-semibold">{b?.name ?? d.name}</div>
@@ -64,11 +72,12 @@ export function SidePanel({ selected, onSelect, states, doneCounts }:
         <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: STATE_DOT[st] }} />
         <span>{BADGE[st] ?? ""} {STATE_LABEL[st]}</span>
       </div>
+      {activity[selected] && <p className="text-xs italic text-[#cfc8b2]">Now: {activity[selected]}</p>}
       <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
         <dt className="text-[#a9a28e]">Power (model)</dt><dd>{b?.model?.replace("claude-", "") ?? "–"}</dd>
         <dt className="text-[#a9a28e]">Stamina (turns)</dt><dd>{b?.turns ?? "–"}</dd>
         <dt className="text-[#a9a28e]">Tasks finished</dt><dd>{doneCounts[selected] ?? 0}</dd>
-        <dt className="text-[#a9a28e]">Territory</dt><dd className="break-words">{b?.writes?.join(", ") || "–"}</dd>
+        <dt className="text-[#a9a28e]">Territory</dt><dd className="wrap-break-word">{b?.writes?.join(", ") || "–"}</dd>
       </dl>
       {myJobs.length > 0 && (
         <div>

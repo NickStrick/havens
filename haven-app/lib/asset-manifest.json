@@ -1,0 +1,14 @@
+{
+  "benders": {
+    "coach": {},
+    "foreman": {},
+    "herald": {},
+    "ledger": {},
+    "runner": {},
+    "scholar": {},
+    "scout": {}
+  },
+  "districts": {},
+  "terrain": [],
+  "emblems": []
+}
