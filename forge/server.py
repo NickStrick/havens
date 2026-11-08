@@ -236,6 +236,24 @@ async def run_now():
     return {"ok": True}
 
 
+@app.get("/jobs")
+def list_jobs():
+    return [{"job": j.__name__, "agent": a, "active": a in BENDERS, "cron": c} for j, a, c in JOBS]
+
+
+@app.post("/jobs/{name}")
+async def trigger_job(name: str):
+    """Fire a scheduled job now (queues its task), then drain the queue."""
+    for job, agent, _ in JOBS:
+        if job.__name__ == name:
+            if agent not in BENDERS:
+                return {"ok": False, "error": f"{agent} is not recruited yet"}
+            job()
+            asyncio.create_task(drain())
+            return {"ok": True, "queued_for": agent}
+    return {"ok": False, "error": f"no job named {name}"}
+
+
 @app.websocket("/ws")
 async def ws(socket: WebSocket):
     await socket.accept()
