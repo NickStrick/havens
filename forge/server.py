@@ -217,6 +217,23 @@ def events(limit: int = 200):
     return [dict(zip(["ts", "agent", "type", "detail", "cost"], r)) for r in rows]
 
 
+@app.get("/costs")
+def costs():
+    """Spend from the event log, summed by code: today, this ISO week, all time, per bender."""
+    now = datetime.now()
+    day0 = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week0 = day0.timestamp() - day0.weekday() * 86400
+    q = "select coalesce(sum(cost), 0) from events where cost is not null and ts >= ?"
+    per = db.execute("select agent, sum(cost), count(*) from events where cost is not null "
+                     "group by agent").fetchall()
+    return {
+        "today": round(db.execute(q, (day0.timestamp(),)).fetchone()[0], 4),
+        "week": round(db.execute(q, (week0,)).fetchone()[0], 4),
+        "total": round(db.execute(q, (0,)).fetchone()[0], 4),
+        "by_agent": {a: {"usd": round(c, 4), "runs": n} for a, c, n in per},
+    }
+
+
 @app.get("/metrics")
 def metrics(period: str = "week"):
     return compute_metrics(period)
@@ -230,10 +247,27 @@ def latest_review():
     return {"name": files[-1].stem, "content": files[-1].read_text(encoding="utf-8")}
 
 
+def pending():
+    """Tasks the queue would run now: status todo, for a recruited bender."""
+    out = []
+    for p in sorted(run_queue.QUEUE.glob("*.md")):
+        meta, _ = run_queue.read_task(p)
+        if meta.get("status") == "todo" and meta.get("agent") in BENDERS:
+            out.append({"task": p.stem, "agent": meta["agent"]})
+    return out
+
+
+@app.get("/queue")
+def queue():
+    return {"busy": lock.locked(), "pending": pending()}
+
+
 @app.post("/run")
 async def run_now():
-    asyncio.create_task(drain())
-    return {"ok": True}
+    tasks, busy = pending(), lock.locked()
+    if tasks:
+        asyncio.create_task(drain())
+    return {"ok": True, "busy": busy, "pending": tasks}
 
 
 @app.get("/jobs")
