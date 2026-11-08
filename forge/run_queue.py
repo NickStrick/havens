@@ -12,7 +12,10 @@ QUEUE, DONE = VAULT / "Agents/Queue", VAULT / "Agents/Done"
 
 # Windows defaults to cp1252, which breaks on emoji and smart quotes, so always use UTF-8.
 def read_task(path):
-    _, fm, body = path.read_text(encoding="utf-8").split("---", 2)
+    text = path.read_text(encoding="utf-8")
+    if not text.lstrip().startswith("---") or text.count("---") < 2:
+        return {}, text.strip()  # no frontmatter: main() reports and skips it
+    _, fm, body = text.split("---", 2)
     return yaml.safe_load(fm) or {}, body.strip()
 
 
@@ -64,6 +67,9 @@ async def run(task_path):
 async def main():
     for path in sorted(QUEUE.glob("*.md")):
         meta, _ = read_task(path)
+        if not meta.get("agent"):
+            print(f"[queue] skipping {path.name}: no frontmatter with agent/status")
+            continue
         if meta.get("status") == "todo" and meta.get("agent") in BENDERS:
             await run(path)
 

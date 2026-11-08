@@ -8,3 +8,6 @@ vault/.obsidian/cache
 forge/.venv/
 __pycache__/
 forge/events.db
+
+.env
+.venv
