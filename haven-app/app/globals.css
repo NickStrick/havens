@@ -75,3 +75,21 @@ body {
 }
 
 .tabular { font-variant-numeric: tabular-nums; }
+
+/* ---------- Ellora ---------- */
+.particle { transform-box: fill-box; transform-origin: center; opacity: 0; }
+.p-rise  { animation: p-rise 1.4s ease-out infinite; }
+.p-swirl { animation: p-swirl 1.8s ease-in-out infinite; }
+.p-drift { animation: p-drift 1.6s ease-out infinite; }
+.p-spark { animation: p-spark 0.9s steps(2, end) infinite; }
+@keyframes p-rise  { 0% { opacity: 0; transform: translateY(4px) scale(.6) } 30% { opacity: .9 } 100% { opacity: 0; transform: translateY(-26px) scale(1.1) } }
+@keyframes p-swirl { 0% { opacity: 0; transform: translate(0,0) } 30% { opacity: .8 } 100% { opacity: 0; transform: translate(14px,-22px) rotate(180deg) } }
+@keyframes p-drift { 0% { opacity: 0; transform: translate(-6px,2px) } 30% { opacity: .85 } 100% { opacity: 0; transform: translate(16px,-8px) } }
+@keyframes p-spark { 0% { opacity: 1; transform: translateY(-10px) scale(1.4) } 50% { opacity: 0 } 100% { opacity: .9; transform: translate(6px,-18px) scale(.8) } }
+.sel-pulse { animation: sel-pulse 1.6s ease-in-out infinite; }
+@keyframes sel-pulse { 50% { opacity: .35 } }
+[role="button"]:focus-visible > polygon:first-child { stroke: #fff; stroke-width: 3; }
+@media (prefers-reduced-motion: reduce) {
+  .particle, .sel-pulse, .animate-bounce { animation: none !important; }
+  .particle { opacity: .6; }
+}

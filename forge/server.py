@@ -409,6 +409,9 @@ def costs():
         "month": month_spend(),
         "total": round(db.execute(q, (0,)).fetchone()[0], 4),
         "by_agent": {a: {"usd": round(c, 4), "runs": n, "avg": round(c / n, 4)} for a, c, n in per},
+        # finished tasks per bender, all time (Ellora grows a floor per finished task)
+        "done": dict(db.execute("select agent, count(*) from events where type = 'done' "
+                                "group by agent").fetchall()),
     }
 
 
